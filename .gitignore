@@ -3,6 +3,7 @@ node_modules
 dist
 .idea
 typings
+.vscode
 
 # files
 package-lock.json
