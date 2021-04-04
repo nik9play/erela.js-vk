@@ -4,6 +4,7 @@ dist
 .idea
 typings
 .vscode
+test
 
 # files
 package-lock.json
