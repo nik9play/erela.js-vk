@@ -306,7 +306,13 @@ export class Player {
         await (this.queue.current as UnresolvedTrack).resolve()
       } catch (error) {
         this.manager.emit("trackError", this, this.queue.current, error);
-        if (this.queue[0]) return this.play(this.queue[0]);
+
+        this.queue.current = null
+        if (this.queue[0]) {
+          return this.play(this.queue.shift());
+        }
+        this.playing = false;
+        this.manager.emit("queueEnd", this, this.queue.current, "NO_MATCHES");
         return;
       }
     }

@@ -176,9 +176,9 @@ export abstract class TrackUtils {
         const author = this.author;
 
         const resolved = await TrackUtils.manager.search(query)
-        if (resolved.loadType === 'LOAD_FAILED' || resolved.loadType === 'NO_MATCHES') {
-          console.log(`LOAD_FAILED/NO_MATCHES: ${resolved.exception.message}`)
-          throw resolved.exception
+        if (resolved.loadType === 'NO_MATCHES') {
+          console.log(`UNRESOLVED NO_MATCHES`)
+          throw new Error("Load error")
         }
         
         //Object.getOwnPropertyNames(this).forEach(prop => delete this[prop])
