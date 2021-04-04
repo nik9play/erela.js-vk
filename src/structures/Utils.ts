@@ -160,6 +160,43 @@ export abstract class TrackUtils {
     return unresolvedTrack as UnresolvedTrack;
   }
 
+  /**
+   * Builds a UnresolvedTrack to be resolved before being played.
+   * @param query
+   * @param requester
+   */
+  static buildUnresolvedQuery(query: string, requester?: unknown): UnresolvedTrack {
+    if (typeof query === "undefined")
+      throw new RangeError('Argument "query" must be present.');
+
+    const unresolvedTrack: Partial<UnresolvedTrack> = {
+      requester,
+      async resolve(): Promise<void> {
+        const title = this.title;
+        const author = this.author;
+
+        const resolved = await TrackUtils.manager.search(query)
+        if (resolved.loadType === 'LOAD_FAILED' || resolved.loadType === 'NO_MATCHES') {
+          console.log(`LOAD_FAILED/NO_MATCHES: ${resolved.exception.message}`)
+          throw resolved.exception
+        }
+        
+        //Object.getOwnPropertyNames(this).forEach(prop => delete this[prop])
+        Object.assign(this, resolved.tracks[0]);
+
+        this.title = title;
+        this.author = author;
+      }
+    };
+
+    Object.defineProperty(unresolvedTrack, UNRESOLVED_TRACK_SYMBOL, {
+      configurable: true,
+      value: true
+    });
+
+    return unresolvedTrack as UnresolvedTrack;
+  }
+
   static async getClosestTrack(
     unresolvedTrack: UnresolvedTrack
   ): Promise<Track> {
