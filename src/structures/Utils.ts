@@ -176,8 +176,9 @@ export abstract class TrackUtils {
         const author = this.author;
 
         const resolved = await TrackUtils.manager.search(query)
-        if (resolved.loadType === 'NO_MATCHES') {
-          console.log(`UNRESOLVED NO_MATCHES`)
+        
+        if (resolved.loadType === 'NO_MATCHES' || resolved.loadType === 'LOAD_FAILED') {
+          console.log(`UNRESOLVED NO_MATCHES/LOAD_FAILED`)
           throw new Error("Load error")
         }
         
