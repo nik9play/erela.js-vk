@@ -464,7 +464,7 @@ export class Manager extends EventEmitter {
       if (player.voiceChannel !== data.d.channel_id) {
         this.emit("playerMove", player, player.voiceChannel, data.d.channel_id);
         data.d.channel_id = player.voiceChannel;
-        player.pause(true);
+        //player.pause(true);
       }
     }
 
