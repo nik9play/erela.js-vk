@@ -56,11 +56,11 @@ export class Player {
   public playing = false;
   /** Whether the player is paused. */
   public paused = false;
-  /** Whether the player is playing. */
+  /** The volume for the player */
   public volume: number;
   /** The Node for the Player. */
   public node: Node;
-  /** The guild the player. */
+  /** The guild for the player. */
   public guild: string;
   /** The voice channel for the player. */
   public voiceChannel: string | null = null;
@@ -71,7 +71,7 @@ export class Player {
   /** The equalizer bands array. */
   public bands = new Array<number>(15).fill(0.0);
   /** The voice state object from Discord. */
-  public voiceState: VoiceState = Object.assign({});
+  public voiceState: VoiceState;
   /** The Manager. */
   public manager: Manager;
   private static _manager: Manager;
@@ -114,6 +114,7 @@ export class Player {
     check(options);
 
     this.guild = options.guild;
+    this.voiceState = Object.assign({ op: "voiceUpdate", guildId: options.guild });
 
     if (options.voiceChannel) this.voiceChannel = options.voiceChannel;
     if (options.textChannel) this.textChannel = options.textChannel;
@@ -220,9 +221,11 @@ export class Player {
   }
 
   /** Destroys the player. */
-  public destroy(): void {
+  public destroy(disconnect = true): void {
     this.state = "DESTROYING";
-    this.disconnect();
+    if (disconnect) {
+      this.disconnect();
+    }
 
     this.node.send({
       op: "destroy",

@@ -1,6 +1,7 @@
 /* eslint-disable no-async-promise-executor */
 import Collection from "@discordjs/collection";
 import { EventEmitter } from "events";
+import { VoiceState } from "..";
 import { Node, NodeOptions } from "./Node";
 import { Player, PlayerOptions, Track, UnresolvedTrack } from "./Player";
 import {
@@ -14,10 +15,11 @@ import {
   TrackStuckEvent,
   TrackUtils,
   VoicePacket,
+  VoiceServer,
   WebSocketClosedEvent,
 } from "./Utils";
 
-const TEMPLATE = JSON.stringify(["event", "guildId", "op", "sessionId"]);
+const REQUIRED_KEYS = ["event", "guildId", "op", "sessionId"];
 
 function check(options: ManagerOptions) {
   if (!options) throw new TypeError("ManagerOptions must not be empty.");
@@ -66,6 +68,12 @@ function check(options: ManagerOptions) {
     typeof options.clientName !== "string"
   )
     throw new TypeError('Manager option "clientName" must be a string.');
+  
+  if (
+    typeof options.defaultSearchPlatform !== "undefined" &&
+    typeof options.defaultSearchPlatform !== "string"
+  )
+    throw new TypeError('Manager option "defaultSearchPlatform" must be a string.');
 }
 
 export interface Manager {
@@ -146,6 +154,15 @@ export interface Manager {
   on(
     event: "playerMove",
     listener: (player: Player, initChannel: string, newChannel: string) => void
+  ): this;
+
+  /**
+   * Emitted when a player is disconnected from it's current voice channel.
+   * @event Manager#playerDisconnect
+   */
+  on(
+    event: "playerDisconnect",
+    listener: (player: Player, oldChannel: string) => void
   ): this;
 
   /**
@@ -257,6 +274,7 @@ export class Manager extends EventEmitter {
       shards: 1,
       autoPlay: true,
       clientName: "erela.js",
+      defaultSearchPlatform: "youtube",
       ...options,
     };
 
@@ -313,9 +331,10 @@ export class Manager extends EventEmitter {
       const sources = {
         soundcloud: "sc",
         youtube: "yt",
+        "youtube music": "ytm"
       };
 
-      const source = sources[(query as SearchQuery).source ?? "youtube"];
+      const source = sources[(query as SearchQuery).source ?? this.options.defaultSearchPlatform];
       let search = (query as SearchQuery).query || (query as string);
 
       if (!/^https?:\/\//.test(search)) {
@@ -443,34 +462,44 @@ export class Manager extends EventEmitter {
    * Sends voice data to the Lavalink server.
    * @param data
    */
-  public updateVoiceState(data: VoicePacket): void {
-    if (
-      !data ||
-      !["VOICE_SERVER_UPDATE", "VOICE_STATE_UPDATE"].includes(data.t || "")
-    )
-      return;
-    const player = this.players.get(data.d.guild_id) as Player;
+  public updateVoiceState(data: VoicePacket | VoiceServer | VoiceState): void {
+    if ("t" in data && !["VOICE_STATE_UPDATE", "VOICE_SERVER_UPDATE"].includes(data.t)) return;
 
+    const update: VoiceServer | VoiceState = "d" in data ? data.d : data;
+    if (!update || !("token" in update) && !("session_id" in update)) return;
+
+    const player = this.players.get(update.guild_id) as Player;
     if (!player) return;
-    const state = player.voiceState;
 
-    if (data.t === "VOICE_SERVER_UPDATE") {
-      state.op = "voiceUpdate";
-      state.guildId = data.d.guild_id;
-      state.event = data.d;
+    if ("token" in update) {
+      /* voice server update */
+      player.voiceState.event = update;
     } else {
-      if (data.d.user_id !== this.options.clientId) return;
-      state.sessionId = data.d.session_id;
-      if (player.voiceChannel !== data.d.channel_id) {
-        this.emit("playerMove", player, player.voiceChannel, data.d.channel_id);
-        data.d.channel_id = player.voiceChannel;
+      /* voice state update */
+      if (update.user_id !== this.options.clientId) {
+        return;      
+      }
+
+      if (update.channel_id) {
+        if (player.voiceChannel !== update.channel_id) {
+          /* we moved voice channels. */
+          this.emit("playerMove", player, player.voiceChannel, update.channel_id);
+        }
+
+        player.voiceState.sessionId = update.session_id;
+        player.voiceChannel = update.channel_id;
+      } else {
+        /* player got disconnected. */
+        this.emit("playerDisconnect", player.bands, player.voiceChannel);
+        player.voiceChannel = null;
+        player.voiceState = Object.assign({});
         player.pause(true);
       }
     }
 
-    player.voiceState = state;
-    if (JSON.stringify(Object.keys(state).sort()) === TEMPLATE)
-      player.node.send(state);
+    if (REQUIRED_KEYS.every(key => key in player.voiceState)) {
+      player.node.send(player.voiceState);
+    }
   }
 }
 
@@ -500,6 +529,8 @@ export interface ManagerOptions {
   autoPlay?: boolean;
   /** An array of track properties to keep. `track` will always be present. */
   trackPartial?: string[];
+  /** The default search platform to use, can be "youtube", "youtube music", or "soundcloud". */
+  defaultSearchPlatform?: SearchPlatform;
   /**
    * Function to send data to the websocket.
    * @param id
@@ -508,9 +539,11 @@ export interface ManagerOptions {
   send(id: string, payload: Payload): void;
 }
 
+export type SearchPlatform = "youtube" | "youtube music" | "soundcloud";
+
 export interface SearchQuery {
   /** The source to search from. */
-  source?: "youtube" | "soundcloud";
+  source?: SearchPlatform;
   /** The query to search for. */
   query: string;
 }
