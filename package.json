@@ -1,6 +1,6 @@
 {
   "name": "erela.js-vk",
-  "version": "2.3.3-vk-6",
+  "version": "2.3.3-vk-8",
   "description": "An easy-to-use Lavalink client for NodeJS with extra functionality added for my bot. ",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
