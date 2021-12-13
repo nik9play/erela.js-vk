@@ -350,6 +350,10 @@ export class Manager extends EventEmitter {
       if (!res) {
         return reject(new Error("Query not found."));
       }
+      
+      if (!res.tracks) {
+        return reject(new Error("Tracks not found."))
+      }
 
       const result: SearchResult = {
         loadType: res.loadType,
