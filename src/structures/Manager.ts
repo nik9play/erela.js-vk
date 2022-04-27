@@ -1,7 +1,7 @@
 /* eslint-disable no-async-promise-executor */
 import Collection from "@discordjs/collection";
 import { EventEmitter } from "events";
-import { VoiceState } from "..";
+import { VoiceState } from "./Utils";
 import { Node, NodeOptions } from "./Node";
 import { Player, PlayerOptions, Track, UnresolvedTrack } from "./Player";
 import {
