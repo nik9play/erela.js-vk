@@ -235,17 +235,27 @@ export class Manager extends EventEmitter {
       .sort((a, b) => b.calls - a.calls);
   }
 
+  /** Count penalties for node */
+  private countPenalties(node: Node): number {
+    let penalties = 0;
+    penalties += node.stats.players;
+    penalties += Math.round(Math.pow(1.05, 100 * node.stats.cpu.systemLoad) * 10 - 10);
+    if (node.stats.frameStats) {
+      penalties += Math.pow(1.03, 500 * (node.stats.frameStats.deficit / 3000) * 600 - 600);
+      penalties += Math.pow(1.03, 500 * (node.stats.frameStats.nulled / 3000) * 300 - 300) * 2;
+    }
+
+    return penalties;
+  }
+
   /** Returns the least system load Nodes. */
   public get leastLoadNodes(): Collection<string, Node> {
     return this.nodes
       .filter((node) => node.connected)
       .sort((a, b) => {
-        const aload = a.stats.cpu
-          ? (a.stats.cpu.systemLoad) * 100
-          : 0;
-        const bload = b.stats.cpu
-          ? (b.stats.cpu.systemLoad) * 100
-          : 0;
+        const aload = this.countPenalties(a);
+        const bload = this.countPenalties(b);
+
         return aload - bload;
       });
   }
