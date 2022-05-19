@@ -347,7 +347,7 @@ export class Manager extends EventEmitter {
     requester?: unknown
   ): Promise<SearchResult> {
     return new Promise(async (resolve, reject) => {
-      const node = this.leastUsedNodes.first();
+      const node = this.leastLoadNodes.first();
       if (!node) throw new Error("No available nodes.");
 
       const _query: SearchQuery = typeof query === "string" ? { query } : query;
