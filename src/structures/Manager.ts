@@ -1,5 +1,5 @@
 /* eslint-disable no-async-promise-executor */
-import Collection from "@discordjs/collection";
+import { Collection } from "@discordjs/collection";
 import { EventEmitter } from "events";
 import { VoiceState } from "./Utils";
 import { Node, NodeOptions } from "./Node";
@@ -358,11 +358,9 @@ export class Manager extends EventEmitter {
         search = `${_source}:${search}`;
       }
 
-      const res = await node.makeRequest<LavalinkResult>(`/loadtracks?identifier=${encodeURIComponent(search)}`, r => {
-        if (node.options.requestTimeout) {
-          r.timeout(node.options.requestTimeout)
-        }
-      }).catch(err => reject(err));
+      const res = await node
+        .makeRequest<LavalinkResult>(`/loadtracks?identifier=${encodeURIComponent(search)}`)
+        .catch(err => reject(err));
 
       if (!res) {
         return reject(new Error("Query not found."));
@@ -375,9 +373,9 @@ export class Manager extends EventEmitter {
       const result: SearchResult = {
         loadType: res.loadType,
         exception: res.exception ?? null,
-        tracks: res.tracks.map((track: TrackData) =>
+        tracks: res.tracks?.map((track: TrackData) =>
           TrackUtils.build(track, requester)
-        ),
+        ) ?? [],
       };
 
       if (result.loadType === "PLAYLIST_LOADED") {
@@ -406,9 +404,12 @@ export class Manager extends EventEmitter {
       const node = this.nodes.first();
       if (!node) throw new Error("No available nodes.");
 
-      const res = await node.makeRequest<TrackData[]>(`/decodetracks`, r => r
-        .method("POST")
-        .body(tracks, "json"))
+      const res = await node.makeRequest<TrackData[]>(`/decodetracks`, r => {
+        r.method = "POST";
+        r.body = JSON.stringify(tracks);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        r.headers!["Content-Type"] = "application/json";
+      })
         .catch(err => reject(err));
 
       if (!res) {

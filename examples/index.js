@@ -1,8 +1,7 @@
 const { Client, Collection } = require("discord.js");
 const { readdirSync } = require("fs");
 const { Manager } = require("erela.js");
-
-const client = new Client();
+const client = new Client({ intents: ["Guilds", "GuildMessages", "GuildVoiceStates", "MessageContent"] });
 client.commands = new Collection();
 
 const files = readdirSync("./commands")
@@ -16,6 +15,7 @@ for (const file of files) {
 client.manager = new Manager({
   nodes: [{
     host: "localhost",
+    port: 1212,
     retryDelay: 5000,
   }],
   autoPlay: true,
@@ -45,7 +45,7 @@ client.once("ready", () => {
 
 client.on("raw", d => client.manager.updateVoiceState(d));
 
-client.on("message", async message => {
+client.on("messageCreate", async message => {
   if (!message.content.startsWith("!") || !message.guild || message.author.bot) return;
   const [name, ...args] = message.content.slice(1).split(/\s+/g);
 
@@ -55,8 +55,8 @@ client.on("message", async message => {
   try {
     command.run(message, args);
   } catch (err) {
-    message.reply(`an error occurred while running the command: ${err.message}`);
+    message.reply(`An error occurred while running the command: ${err.message}`);
   }
 });
 
-client.login("your bot token here");
+client.login("your bot token");
