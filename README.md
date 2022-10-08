@@ -1,9 +1,9 @@
 <div align = "center">
-    <img src = "https://solaris.codes/projects/erelajs/images/transparent_logo.png">
+    <img src = "https://solaris-site.netlify.app/projects/erelajs/images/transparent_logo.png">
     <hr>
     <br>
-    <a href="https://discord.gg/D6FXw55">
-<img src="https://img.shields.io/discord/653436871858454538?color=7289DA&label=Support&logo=discord&style=for-the-badge" alt="Discord">
+    <a href="https://discord.gg/menudocs">
+<img src="https://img.shields.io/discord/416512197590777857?color=7289DA&label=Support&logo=discord&style=for-the-badge" alt="Discord">
 </a>
 
 <a href="https://www.npmjs.com/package/erela.js">
@@ -16,21 +16,23 @@
 
 <br>
 
-<a href="https://github.com/Solaris9/erela.js">
-<img src="https://img.shields.io/github/stars/Solaris9/erela.js?color=333&logo=github&style=for-the-badge" alt="Github stars">
+<a href="https://github.com/MenuDocs/erela.js">
+<img src="https://img.shields.io/github/stars/MenuDocs/erela.js?color=333&logo=github&style=for-the-badge" alt="Github stars">
 </a>
 
-<a href="https://github.com/Solaris9/erela.js/blob/master/LICENSE">
-<img src="https://img.shields.io/github/license/Solaris9/erela.js?color=6e5494&logo=github&style=for-the-badge" alt="License">
+<a href="https://github.com/MenuDocs/erela.js/blob/master/LICENSE">
+<img src="https://img.shields.io/github/license/MenuDocs/erela.js?color=6e5494&logo=github&style=for-the-badge" alt="License">
 </a>
 <hr>
 </div>
 
+> Erela was transferred to MenuDocs, because I no longer wish to work with Discord related development. It will from now on be maintained by [MenuDocs](https://github.com/MenuDocs). ~ @Solaris9
+
 ## Documentation & Guides
 
-- [Documentation](http://solaris.codes/projects/erelajs/docs/gettingstarted.html "Erela.js Documentation")
+- [Documentation](https://erelajs-docs.netlify.app/docs/gettingstarted.html "Erela.js Documentation")
 
-- [Guides](http://solaris.codes/projects/erelajs/guides/introduction.html "Erela.js Guides")
+- [Guides](https://erelajs-docs.netlify.app/guides/introduction.html "Erela.js Guides")
 
 ## Prerequisites
 
@@ -44,27 +46,29 @@
 
 ## Installation
 
-**NPM** :
+##### **NPM**
 
 ```bash
 npm install erela.js
 ```
 
-**Yarn** :
+##### **Yarn**
 
 ```bash
 yarn add erela.js
 ```
 
+**Note**: _Node **v16** is required!_
+
 ## Getting Started
 
-- Create an application.yml file in your working directory and copy the [example](https://github.com/Frederikam/Lavalink/blob/master/LavalinkServer/application.yml.example "application.yml file") into the created file and edit it with your configuration.
+- Create an application.yml file in your working directory and copy the [example](https://github.com/freyacodes/Lavalink/blob/master/LavalinkServer/application.yml.example "application.yml file") into the created file and edit it with your configuration.
 
 - Run the jar file by running `java -jar Lavalink.jar` in a Terminal window.
 
 ## Example usage
 
-Please read the guides to start: <https://solaris.codes/projects/erelajs/guides/introduction.html>
+Please read the guides to start: <https://erelajs-docs.netlify.app/docs/gettingstarted.html#example-usage>
 
 ## Plugins
 
@@ -72,7 +76,7 @@ You can use plugins below to extend Erela.js' features easily.
 
 Note: These are the only ones shown before being published, check the GitHub repository for a complete list.
 
-- [erela.js-spotify](https://github.com/Solaris9/erela.js-spotify) - Converts a Spotify URL into a UnresolvedTrack to play later.
+- [erela.js-spotify](https://github.com/MenuDocs/erela.js-spotify) - Converts a Spotify URL into a UnresolvedTrack to play later.
 
 
 ## Contributors
@@ -87,6 +91,11 @@ Note: These are the only ones shown before being published, check the GitHub rep
 
 - Contributor
 - Github: [@Anish-Shobith](https://github.com/Anish-Shobith)
+
+👤 **melike2d**
+
+- Contributor
+- Github: [@melike2d](https://github.com/melike2d)
 
 👤 **ayntee**
 
